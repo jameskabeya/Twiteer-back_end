@@ -124,6 +124,10 @@ const Postdelete = (req, res) => {
     res.status(200).json(products)
     return(res.send('with succes deleted'))
 }
+// const getUser = ('/:id', (req, res) =>{
+//     // return Prisma.user.findUnique({where :{id}})
+//     getUser
+// })
 
 
-module.exports = { Postposts, Postput, Postget, Postdelete,PostgetId,Authentic,Authorization };
+module.exports = { Postposts, Postput, Postget, Postdelete,PostgetId,Authentic,Authorization};

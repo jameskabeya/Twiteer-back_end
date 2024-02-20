@@ -14,7 +14,6 @@ router.get('/', (req, res) => {
  prisma.use.findMany()
  .then(users => res.send(users))
 });
-
 app.post('/Authentication', Postposts.Authentic)
 async function getUsers() {
 }

@@ -14,15 +14,15 @@ model User {
   id       Int     @id @default(autoincrement())
   email    String  @unique
   password String
-  active   Boolean @default(false)
+  like   Boolean @default(false)
   posts    Post[]
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  titre     String
-  content   String?
-  createdAt DateTime @default(now())
+  name        Int      @id @default(autoincrement())
+  paragraph     String
+  comment   String?
+  share DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User?    @relation(fields: [userId], references: [id])
   userId    Int?
