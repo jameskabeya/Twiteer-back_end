@@ -2,6 +2,8 @@ const express = require('express');
 const products = require('../../Model/data');
 const users = require('../../Model/data_Authentication.js')
 const jwt = require('jsonwebtoken')
+const {PrismaClient} = require('@prisma/client')
+const prisma = new PrismaClient()
 const app = express();
 
 app.use(express.json())
@@ -114,20 +116,24 @@ const PostgetId = ('/:id', (req, res) => {
     
 })
 
-const Postdelete = (req, res) => {
-    const id = Number(req.params.productID)
-    const index = products.findIndex(product => product.id === id)
-    if (index === -1) {
-        return res.status(404).json("Id Not found")
-    }
-    products.splice(index,1)
-    res.status(200).json(products)
-    return(res.send('with succes deleted'))
+// const Postdelete = (req, res) => {
+//     const id = parseInt(req.params.id)
+//     const user = prisma.delete({where: {id:id}}).then()
+//     res.status(200).send(`user ${id} Successfully deleted`)
+//     const id = Number(req.params.productID)
+//     const index = products.findIndex(product => product.id === id)
+//     if (index === -1) {
+//         return res.status(404).json("Id Not found")
+//     }
+//     products.splice(index,1)
+//     res.status(200).json(products)
+//     return(res.send('with succes deleted'))
+// }
+async function Postdelete(req, res) {
+    const id = parseInt(req.params.id)
+    const user = await prisma.user.delete({where: {id:id}}).then()
+    res.status(200).send(`user ${id} Successfully deleted`)
 }
-// const getUser = ('/:id', (req, res) =>{
-//     // return Prisma.user.findUnique({where :{id}})
-//     getUser
-// })
 
 
 module.exports = { Postposts, Postput, Postget, Postdelete,PostgetId,Authentic,Authorization};

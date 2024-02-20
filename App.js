@@ -10,10 +10,6 @@ const Postposts = require("./src/Controller/post_controller");
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
-router.get('/', (req, res) => {
- prisma.use.findMany()
- .then(users => res.send(users))
-});
 app.post('/Authentication', Postposts.Authentic)
 async function getUsers() {
 }
@@ -26,7 +22,17 @@ app.get('/Toget/', Postposts.Postget);
 app.get('/Toget/:id', Postposts.PostgetId);
 
 app.put('/Toput/', Postposts.Postput);
-app.delete('/Todelete/:productID', Postposts.Postdelete);
+app.delete('/Todelete/:id', Postposts.Postdelete);
+
+prisma.User.create({
+    data: {
+        email: "BroD@gmail.com",
+        password: "Bouce"
+    }
+}).then(console.log())
+prisma.User.findMany({
+    where: {email: {startsWith: ''}}
+}).then(console.log())
 
 
 app.listen(Port, (err) => {
