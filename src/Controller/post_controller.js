@@ -1,13 +1,11 @@
 const express = require('express');
-const products = require('../../Model/data');
 const users = require('../../Model/data_Authentication.js')
 const jwt = require('jsonwebtoken')
-const {PrismaClient} = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const app = express();
 
 app.use(express.json())
-
 
 const privatekey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEogIBAAKCAQEA64haUFTb3jA5IAGk5di1ELgNVZb+WP6+OWCe0FfjsaaoM6nx
@@ -47,36 +45,38 @@ DWK0dQLmzGzucZRPtYxN6lmmezjUQsFyPK4Fn7O74YYoDQ7dnzMLMlUaozS0Nw/e
 jQIDAQAB
 -----END PUBLIC KEY-----`
 
-const Postposts = ('/', (req, res) => {
-    const newProduct = {
-        id: products.length + 1,
-        name: req.body.name,
-        like: req.body.like,
-        comment: req.body.comment,
-        image: req.body.image
-    }
-    products.push(newProduct)
-    res.status(201).json(products)
+const Postposts = ('/', async (req, res) => {
+    const products = await prisma.posts.findMany({
+        relationLoadStrategy: 'join',
+        include: {
+            user: true,
+        },
+    })
+    return res.json(products)
+})
+const Postpost = ('/:id', async (req, res) => {
+    const products = await prisma.posts.findMany()
+    return res.json(products)
 })
 
-const Authorization = ('/',(req,res) => {
-    const client =req.headers.authorization;
+const Authorization = ('/', (req, res) => {
+    const client = req.headers.authorization;
     jwt.verify(client, publicKey, (err, decode) => {
-      if(err){
-        res.status(401).send('Unautorized')
-      }else{
-        res.status(200).send(products)
-      }
+        if (err) {
+            res.status(401).send('Unautorized')
+        } else {
+            res.status(200).send(products)
+        }
     })
 })
 
 
-const  Authentic = ('/', (req, res) => {
+const Authentic = ('/', (req, res) => {
     const { name, password } = req.body
 
     const valid = users.some((user) => user.name === name && user.password === password)
-    
-    if(valid){
+
+    if (valid) {
         const token = jwt.sign({ name }, privatekey, { algorithm: 'RS256' })
         res.send(token)
     } else {
@@ -104,36 +104,32 @@ const Postput = ('/:id', (req, res) => {
 //     res.json(products)
 // })
 
-const Postget = ('/', (req, res) => {
-    res.json(products)
+const Postget = ('/', async (req, res) => {
+    const posts = await prisma.user.findMany()
+    return res.json(posts)
+})
+
+const PostgetWithJson = ('/', async (req, res) => {
+    const products = await prisma.user.findMany()
+    return res.json(products)
 })
 
 const PostgetId = ('/:id', (req, res) => {
     const id = Number(req.params.id)
     const product = products.findIndex(products => products.id === id)
 
-    res.json(product)
-    
+    res.json(product).then(console.log())
+    prisma.user.findMany({ users: {} }).then(console.log())
+
 })
 
-// const Postdelete = (req, res) => {
-//     const id = parseInt(req.params.id)
-//     const user = prisma.delete({where: {id:id}}).then()
-//     res.status(200).send(`user ${id} Successfully deleted`)
-//     const id = Number(req.params.productID)
-//     const index = products.findIndex(product => product.id === id)
-//     if (index === -1) {
-//         return res.status(404).json("Id Not found")
-//     }
-//     products.splice(index,1)
-//     res.status(200).json(products)
-//     return(res.send('with succes deleted'))
-// }
+
 async function Postdelete(req, res) {
     const id = parseInt(req.params.id)
-    const user = await prisma.user.delete({where: {id:id}}).then()
+    const user = await prisma.user.delete({ where: { id: id } }).then()
     res.status(200).send(`user ${id} Successfully deleted`)
 }
 
 
-module.exports = { Postposts, Postput, Postget, Postdelete,PostgetId,Authentic,Authorization};
+
+module.exports = { Postpost, PostgetWithJson, Postposts, Postput, Postget, Postdelete, PostgetId, Authentic, Authorization };
